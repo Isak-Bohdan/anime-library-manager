@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Відгуки</title>
+</head>
+<body>
+<h1>Відгуки для: <span th:text="${title.title}"></span></h1>
+
+<a href="/titles">Назад до колекції</a>
+<a th:href="@{/titles/{id}/reviews/new(id=${title.id})}">Додати відгук</a>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Текст</th>
+        <th>Оцінка</th>
+        <th>Дата створення</th>
+        <th>Дії</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="review : ${reviews}">
+        <td th:text="${review.id}"></td>
+        <td th:text="${review.reviewText}"></td>
+        <td th:text="${review.score}"></td>
+        <td th:text="${review.createdAt}"></td>
+        <td>
+            <form th:action="@{/titles/{titleId}/reviews/{reviewId}/delete(titleId=${title.id},reviewId=${review.id})}"
+                  method="post"
+                  style="display:inline;">
+                <button type="submit">Видалити</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

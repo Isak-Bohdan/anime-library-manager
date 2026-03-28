@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle}">Форма тайтлу</title>
+</head>
+<body>
+<h1 th:text="${pageTitle}">Форма тайтлу</h1>
+
+<a href="/titles">Назад до списку</a>
+<a href="/search">Знайти через Jikan API</a>
+
+<form th:action="${titleForm.id} == null ? @{/titles} : @{/titles/{id}(id=${titleForm.id})}"
+      th:object="${titleForm}"
+      method="post">
+    <div>
+        <label for="externalId">External ID:</label>
+        <input type="number" id="externalId" th:field="*{externalId}" required>
+    </div>
+
+    <div>
+        <label for="title">Назва:</label>
+        <input type="text" id="title" th:field="*{title}" required>
+    </div>
+
+    <div>
+        <label for="titleJapanese">Японська назва:</label>
+        <input type="text" id="titleJapanese" th:field="*{titleJapanese}">
+    </div>
+
+    <div>
+        <label for="type">Тип:</label>
+        <select id="type" th:field="*{type}" required>
+            <option value="">-- Оберіть тип --</option>
+            <option value="anime">Anime</option>
+            <option value="manga">Manga</option>
+        </select>
+    </div>
+
+    <div>
+        <label for="episodesOrChapters">Епізоди / Глави:</label>
+        <input type="number" id="episodesOrChapters" th:field="*{episodesOrChapters}">
+    </div>
+
+    <div>
+        <label for="status">Статус:</label>
+        <input type="text" id="status" th:field="*{status}">
+    </div>
+
+    <div>
+        <label for="scoreApi">API рейтинг:</label>
+        <input type="number" step="0.1" id="scoreApi" th:field="*{scoreApi}">
+    </div>
+
+    <div>
+        <label for="synopsis">Опис:</label>
+        <textarea id="synopsis" th:field="*{synopsis}"></textarea>
+    </div>
+
+    <div>
+        <label for="imageUrl">URL зображення:</label>
+        <input type="text" id="imageUrl" th:field="*{imageUrl}">
+    </div>
+
+    <div>
+        <label for="year">Рік:</label>
+        <input type="number" id="year" th:field="*{year}">
+    </div>
+
+    <div>
+        <label for="personalScore">Особиста оцінка:</label>
+        <input type="number" id="personalScore" th:field="*{personalScore}">
+    </div>
+
+    <div>
+        <label for="isFavorite">Улюблене:</label>
+        <input type="checkbox" id="isFavorite" th:field="*{isFavorite}">
+    </div>
+
+    <div>
+        <label for="category">Категорія:</label>
+        <select id="category" name="categoryId">
+            <option value="">-- Без категорії --</option>
+            <option th:each="category : ${categories}"
+                    th:value="${category.id}"
+                    th:text="${category.name}"
+                    th:selected="${titleForm.category != null and titleForm.category.id == category.id}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <button type="submit">Зберегти</button>
+    </div>
+</form>
+</body>
+</html>

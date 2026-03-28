@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Пошук через Jikan</title>
+</head>
+<body>
+<h1>Пошук аніме через Jikan API</h1>
+
+<a href="/">На головну</a>
+
+<form action="/search" method="get">
+    <input type="text" name="query" placeholder="Введіть назву аніме">
+    <button type="submit">Пошук</button>
+</form>
+
+<div th:if="${results}">
+    <h2>Результати:</h2>
+
+    <div th:each="anime : ${results}" style="border:1px solid gray; margin:10px; padding:10px;">
+        <p><strong>ID:</strong> <span th:text="${anime.malId}"></span></p>
+        <p><strong>Назва:</strong> <span th:text="${anime.title}"></span></p>
+        <p><strong>Тип:</strong> <span th:text="${anime.type}"></span></p>
+        <p><strong>Епізоди:</strong> <span th:text="${anime.episodes}"></span></p>
+        <p><strong>Рейтинг:</strong> <span th:text="${anime.score}"></span></p>
+        <p><strong>Рік:</strong> <span th:text="${anime.year}"></span></p>
+        <p><strong>Опис:</strong> <span th:text="${anime.synopsis}"></span></p>
+
+        <form th:action="@{/titles/import/{malId}(malId=${anime.malId})}" method="post">
+            <button type="submit">Імпортувати в колекцію</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

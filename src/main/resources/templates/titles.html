@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Моя колекція</title>
+</head>
+<body>
+<h1>Моя колекція</h1>
+
+<a href="/">На головну</a>
+<a href="/titles/new">Додати вручну</a>
+<a href="/search">Імпортувати через Jikan API</a>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Назва</th>
+        <th>Тип</th>
+        <th>Рік</th>
+        <th>Категорія</th>
+        <th>Улюблене</th>
+        <th>Дії</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="title : ${titles}">
+        <td th:text="${title.id}"></td>
+        <td th:text="${title.title}"></td>
+        <td th:text="${title.type}"></td>
+        <td th:text="${title.year}"></td>
+        <td th:text="${title.category != null ? title.category.name : 'Без категорії'}"></td>
+        <td th:text="${title.isFavorite ? 'Так' : 'Ні'}"></td>
+        <td>
+            <a th:href="@{/titles/edit/{id}(id=${title.id})}">Редагувати</a>
+            <a th:href="@{/titles/{id}/reviews(id=${title.id})}">Відгуки</a>
+
+            <form th:action="@{/titles/{id}/delete(id=${title.id})}"
+                  method="post"
+                  style="display:inline;">
+                <button type="submit">Видалити</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

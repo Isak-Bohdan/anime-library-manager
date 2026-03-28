@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Категорії</title>
+</head>
+<body>
+<h1>Список категорій</h1>
+
+<a href="/">На головну</a>
+<a href="/categories/new">Додати категорію</a>
+
+<table border="1" cellpadding="8" cellspacing="0">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Назва</th>
+        <th>Опис</th>
+        <th>Дії</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="category : ${categories}">
+        <td th:text="${category.id}"></td>
+        <td th:text="${category.name}"></td>
+        <td th:text="${category.description}"></td>
+        <td>
+            <div th:if="${!defaultCategoryNames.contains(category.name)}">
+                <a th:href="@{/categories/{id}/edit(id=${category.id})}">Редагувати</a>
+
+                <form th:action="@{/categories/{id}/delete(id=${category.id})}"
+                      method="post"
+                      style="display:inline;">
+                    <button type="submit">Видалити</button>
+                </form>
+            </div>
+
+            <span th:if="${defaultCategoryNames.contains(category.name)}">
+                        Стандартна категорія
+                    </span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

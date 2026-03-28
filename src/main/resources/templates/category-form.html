@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle}">Форма категорії</title>
+</head>
+<body>
+<h1 th:text="${pageTitle}">Форма категорії</h1>
+
+<a href="/categories">Назад до списку категорій</a>
+
+<div th:if="${errorMessage}" style="color:red;">
+    <p th:text="${errorMessage}"></p>
+</div>
+<form th:action="${category.id} == null ? @{/categories} : @{/categories/{id}(id=${category.id})}"
+      th:object="${category}"
+      method="post">
+    <div>
+        <label for="name">Назва:</label>
+        <input type="text" id="name" th:field="*{name}" required>
+    </div>
+
+    <div>
+        <label for="description">Опис:</label>
+        <textarea id="description" th:field="*{description}"></textarea>
+    </div>
+
+    <div>
+        <button type="submit">Зберегти</button>
+    </div>
+</form>
+</body>
+</html>
