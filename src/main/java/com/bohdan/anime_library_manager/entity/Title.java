@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 @Entity
 @Table(name = "titles")
@@ -47,6 +49,10 @@ public class Title {
     private Integer year;
 
     @Column(name = "personal_score")
+
+
+    @Min(value = 1, message = "Score must be at least 1")
+    @Max(value = 10, message = "Score must not exceed 10")
     private Integer personalScore;
 
     @Column(name = "is_favorite", nullable = false)

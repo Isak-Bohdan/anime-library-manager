@@ -2,34 +2,79 @@
 <html lang="uk" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Пошук через Jikan</title>
+    <title>Search via Jikan</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Пошук аніме через Jikan API</h1>
 
-<a href="/">На головну</a>
-
-<form action="/search" method="get">
-    <input type="text" name="query" placeholder="Введіть назву аніме">
-    <button type="submit">Пошук</button>
-</form>
-
-<div th:if="${results}">
-    <h2>Результати:</h2>
-
-    <div th:each="anime : ${results}" style="border:1px solid gray; margin:10px; padding:10px;">
-        <p><strong>ID:</strong> <span th:text="${anime.malId}"></span></p>
-        <p><strong>Назва:</strong> <span th:text="${anime.title}"></span></p>
-        <p><strong>Тип:</strong> <span th:text="${anime.type}"></span></p>
-        <p><strong>Епізоди:</strong> <span th:text="${anime.episodes}"></span></p>
-        <p><strong>Рейтинг:</strong> <span th:text="${anime.score}"></span></p>
-        <p><strong>Рік:</strong> <span th:text="${anime.year}"></span></p>
-        <p><strong>Опис:</strong> <span th:text="${anime.synopsis}"></span></p>
-
-        <form th:action="@{/titles/import/{malId}(malId=${anime.malId})}" method="post">
-            <button type="submit">Імпортувати в колекцію</button>
-        </form>
+<div class="header">
+    <div class="logo">AnimeTracker</div>
+    <div class="nav">
+        <a href="/">Home</a>
+        <a href="/titles">Titles</a>
+        <a href="/categories">Categories</a>
+        <a href="/search">Search</a>
     </div>
 </div>
+
+<div class="container">
+    <h1 class="page-title">Search Anime via Jikan API</h1>
+    <p class="page-subtitle">Find anime and import them directly into your collection.</p>
+
+    <div class="search-panel">
+        <form class="search-form" action="/search" method="get">
+
+            <input type="text"
+                   name="query"
+                   placeholder="Enter title..."
+                   th:value="${param.query}">
+
+            <select name="type">
+                <option value="anime" th:selected="${param.type == 'anime'}">Anime</option>
+                <option value="manga" th:selected="${param.type == 'manga'}">Manga</option>
+            </select>
+
+            <button class="btn btn-primary" type="submit">Search</button>
+
+        </form>
+    </div>
+
+    <div th:if="${results != null and !#lists.isEmpty(results)}" class="results-grid">
+        <div class="result-card" th:each="anime : ${results}">
+            <div class="card-image-wrap">
+                <img th:if="${anime.imageUrl != null}" th:src="${anime.imageUrl}" alt="Anime image">
+                <img th:if="${anime.imageUrl == null}" src="/images/no-image.png" alt="No image">
+            </div>
+
+            <div class="result-card-content">
+                <h3 class="card-title" th:text="${anime.title}"></h3>
+                <div class="card-year" th:text="${anime.year != null ? anime.year : 'Year unknown'}"></div>
+
+                <div class="card-badges">
+                    <span class="badge badge-type" th:text="${anime.type != null ? anime.type : 'Unknown'}"></span>
+                </div>
+
+                <p class="muted"><strong>Episodes:</strong> <span th:text="${anime.episodes}"></span></p>
+                <p class="muted"><strong>Score:</strong> <span th:text="${anime.score}"></span></p>
+                <p class="muted"><strong>Status:</strong> <span th:text="${anime.status}"></span></p>
+                <p class="muted" th:text="${anime.synopsis}"></p>
+
+                <form th:action="@{/titles/import/{malId}(malId=${anime.malId})}" method="post">
+                    <input type="hidden" name="type" th:value="${param.type}">
+                    <button class="btn btn-success">Import to Collection</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${results == null}" class="empty-state">
+        Start by entering an anime title in the search field.
+    </div>
+
+    <div th:if="${results != null and #lists.isEmpty(results)}" class="empty-state">
+        No results found for your query.
+    </div>
+</div>
+
 </body>
 </html>

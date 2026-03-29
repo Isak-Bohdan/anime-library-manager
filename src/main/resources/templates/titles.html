@@ -2,47 +2,67 @@
 <html lang="uk" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Моя колекція</title>
+    <title>My Collection</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Моя колекція</h1>
 
-<a href="/">На головну</a>
-<a href="/titles/new">Додати вручну</a>
-<a href="/search">Імпортувати через Jikan API</a>
+<div class="header">
+    <div class="logo">AnimeTracker</div>
+    <div class="nav">
+        <a href="/">Home</a>
+        <a href="/titles">Titles</a>
+        <a href="/categories">Categories</a>
+        <a href="/search">Search</a>
+    </div>
+</div>
 
-<table border="1" cellpadding="8" cellspacing="0">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Назва</th>
-        <th>Тип</th>
-        <th>Рік</th>
-        <th>Категорія</th>
-        <th>Улюблене</th>
-        <th>Дії</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="title : ${titles}">
-        <td th:text="${title.id}"></td>
-        <td th:text="${title.title}"></td>
-        <td th:text="${title.type}"></td>
-        <td th:text="${title.year}"></td>
-        <td th:text="${title.category != null ? title.category.name : 'Без категорії'}"></td>
-        <td th:text="${title.isFavorite ? 'Так' : 'Ні'}"></td>
-        <td>
-            <a th:href="@{/titles/edit/{id}(id=${title.id})}">Редагувати</a>
-            <a th:href="@{/titles/{id}/reviews(id=${title.id})}">Відгуки</a>
+<div class="container">
+    <h1 class="page-title">My Collection</h1>
 
-            <form th:action="@{/titles/{id}/delete(id=${title.id})}"
-                  method="post"
-                  style="display:inline;">
-                <button type="submit">Видалити</button>
-            </form>
-        </td>
-    </tr>
-    </tbody>
-</table>
+    <div class="actions-row">
+        <a href="/titles/new" class="btn btn-primary">Add manually</a>
+        <a href="/search" class="btn btn-secondary">Import from API</a>
+    </div>
+
+    <div th:if="${titles != null and !#lists.isEmpty(titles)}" class="card-grid">
+        <div class="card" th:each="title : ${titles}">
+            <div class="card-image-wrap">
+                <img th:if="${title.imageUrl != null and !#strings.isEmpty(title.imageUrl)}"
+                     th:src="${title.imageUrl}"
+                     alt="Title image">
+                <img th:if="${title.imageUrl == null or #strings.isEmpty(title.imageUrl)}"
+                     src="/images/no-image.png"
+                     alt="No image">
+            </div>
+
+            <div class="card-content">
+                <h3 class="card-title" th:text="${title.title}"></h3>
+                <div class="card-year" th:text="${title.year != null ? title.year : 'Year unknown'}"></div>
+
+                <div class="card-badges">
+                    <span class="badge badge-type" th:text="${title.type}"></span>
+                    <span class="badge badge-category"
+                          th:text="${title.category != null ? title.category.name : 'None'}"></span>
+                    <span class="badge badge-favorite" th:if="${title.isFavorite}">Favorite</span>
+                </div>
+
+                <div class="card-actions">
+                    <a th:href="@{/titles/edit/{id}(id=${title.id})}" class="btn btn-secondary btn-small">Edit</a>
+                    <a th:href="@{/titles/{id}/reviews(id=${title.id})}" class="btn btn-primary btn-small">Reviews</a>
+
+                    <form th:action="@{/titles/{id}/delete(id=${title.id})}" method="post" class="inline-form">
+                        <button class="btn btn-danger btn-small" type="submit">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:if="${titles == null or #lists.isEmpty(titles)}" class="empty-state">
+        Your collection is empty. Add titles manually or import them from Jikan API.
+    </div>
+</div>
+
 </body>
 </html>

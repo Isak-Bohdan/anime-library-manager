@@ -2,45 +2,62 @@
 <html lang="uk" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Категорії</title>
+    <title>Categories</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1>Список категорій</h1>
 
-<a href="/">На головну</a>
-<a href="/categories/new">Додати категорію</a>
+<div class="header">
+    <div class="logo">AnimeTracker</div>
+    <div class="nav">
+        <a href="/">Home</a>
+        <a href="/titles">Titles</a>
+        <a href="/categories">Categories</a>
+        <a href="/search">Search</a>
+    </div>
+</div>
 
-<table border="1" cellpadding="8" cellspacing="0">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Назва</th>
-        <th>Опис</th>
-        <th>Дії</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="category : ${categories}">
-        <td th:text="${category.id}"></td>
-        <td th:text="${category.name}"></td>
-        <td th:text="${category.description}"></td>
-        <td>
-            <div th:if="${!defaultCategoryNames.contains(category.name)}">
-                <a th:href="@{/categories/{id}/edit(id=${category.id})}">Редагувати</a>
+<div class="container">
+    <h1 class="page-title">Categories</h1>
+    <p class="page-subtitle">Manage default and custom categories for your titles.</p>
 
-                <form th:action="@{/categories/{id}/delete(id=${category.id})}"
-                      method="post"
-                      style="display:inline;">
-                    <button type="submit">Видалити</button>
-                </form>
-            </div>
+    <div class="actions-row">
+        <a href="/categories/new" class="btn btn-primary">Add Category</a>
+    </div>
 
-            <span th:if="${defaultCategoryNames.contains(category.name)}">
-                        Стандартна категорія
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="category : ${categories}">
+                <td th:text="${category.id}"></td>
+                <td th:text="${category.name}"></td>
+                <td th:text="${category.description}"></td>
+                <td>
+                    <div th:if="${!defaultCategoryNames.contains(category.name)}" class="actions-row" style="margin:0;">
+                        <a th:href="@{/categories/{id}/edit(id=${category.id})}" class="btn btn-secondary btn-small">Edit</a>
+
+                        <form th:action="@{/categories/{id}/delete(id=${category.id})}" method="post" class="inline-form">
+                            <button class="btn btn-danger btn-small" type="submit">Delete</button>
+                        </form>
+                    </div>
+
+                    <span th:if="${defaultCategoryNames.contains(category.name)}" class="muted">
+                        Default category
                     </span>
-        </td>
-    </tr>
-    </tbody>
-</table>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 </body>
 </html>

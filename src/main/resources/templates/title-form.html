@@ -2,96 +2,133 @@
 <html lang="uk" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${pageTitle}">Форма тайтлу</title>
+    <title th:text="${pageTitle}">Title Form</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
-<h1 th:text="${pageTitle}">Форма тайтлу</h1>
 
-<a href="/titles">Назад до списку</a>
-<a href="/search">Знайти через Jikan API</a>
-
-<form th:action="${titleForm.id} == null ? @{/titles} : @{/titles/{id}(id=${titleForm.id})}"
-      th:object="${titleForm}"
-      method="post">
-    <div>
-        <label for="externalId">External ID:</label>
-        <input type="number" id="externalId" th:field="*{externalId}" required>
+<div class="header">
+    <div class="logo">AnimeTracker</div>
+    <div class="nav">
+        <a href="/">Home</a>
+        <a href="/titles">Titles</a>
+        <a href="/categories">Categories</a>
+        <a href="/search">Search</a>
     </div>
+</div>
 
-    <div>
-        <label for="title">Назва:</label>
-        <input type="text" id="title" th:field="*{title}" required>
-    </div>
+<div class="container">
+    <h1 class="page-title" th:text="${pageTitle}"></h1>
+    <p class="page-subtitle">Create or edit title information, image, category and personal score.</p>
 
-    <div>
-        <label for="titleJapanese">Японська назва:</label>
-        <input type="text" id="titleJapanese" th:field="*{titleJapanese}">
-    </div>
+    <form class="form-card"
+          th:action="${titleForm.id} == null ? @{/titles} : @{/titles/{id}(id=${titleForm.id})}"
+          th:object="${titleForm}"
+          method="post"
+          enctype="multipart/form-data">
 
-    <div>
-        <label for="type">Тип:</label>
-        <select id="type" th:field="*{type}" required>
-            <option value="">-- Оберіть тип --</option>
-            <option value="anime">Anime</option>
-            <option value="manga">Manga</option>
-        </select>
-    </div>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="externalId">External ID</label>
+                <input type="number" id="externalId" th:field="*{externalId}">
+            </div>
 
-    <div>
-        <label for="episodesOrChapters">Епізоди / Глави:</label>
-        <input type="number" id="episodesOrChapters" th:field="*{episodesOrChapters}">
-    </div>
+            <div class="form-group">
+                <label for="year">Year</label>
+                <input type="number" id="year" th:field="*{year}">
+            </div>
 
-    <div>
-        <label for="status">Статус:</label>
-        <input type="text" id="status" th:field="*{status}">
-    </div>
+            <div class="form-group full">
+                <label for="title">Title</label>
+                <input type="text" id="title" th:field="*{title}" required>
+            </div>
 
-    <div>
-        <label for="scoreApi">API рейтинг:</label>
-        <input type="number" step="0.1" id="scoreApi" th:field="*{scoreApi}">
-    </div>
+            <div class="form-group full">
+                <label for="titleJapanese">Japanese Title</label>
+                <input type="text" id="titleJapanese" th:field="*{titleJapanese}">
+            </div>
 
-    <div>
-        <label for="synopsis">Опис:</label>
-        <textarea id="synopsis" th:field="*{synopsis}"></textarea>
-    </div>
+            <div class="form-group">
+                <label for="type">Type</label>
+                <select id="type" th:field="*{type}">
+                    <option value="">Select</option>
+                    <option value="anime">Anime</option>
+                    <option value="manga">Manga</option>
+                </select>
+            </div>
 
-    <div>
-        <label for="imageUrl">URL зображення:</label>
-        <input type="text" id="imageUrl" th:field="*{imageUrl}">
-    </div>
+            <div class="form-group">
+                <label for="episodesOrChapters">Episodes / Chapters</label>
+                <input type="number" id="episodesOrChapters" th:field="*{episodesOrChapters}">
+            </div>
 
-    <div>
-        <label for="year">Рік:</label>
-        <input type="number" id="year" th:field="*{year}">
-    </div>
+            <div class="form-group">
+                <label for="status">Status</label>
+                <input type="text" id="status" th:field="*{status}">
+            </div>
 
-    <div>
-        <label for="personalScore">Особиста оцінка:</label>
-        <input type="number" id="personalScore" th:field="*{personalScore}">
-    </div>
+            <div class="form-group">
+                <label for="scoreApi">API Score</label>
+                <input type="number" step="0.1" id="scoreApi" th:field="*{scoreApi}">
+            </div>
 
-    <div>
-        <label for="isFavorite">Улюблене:</label>
-        <input type="checkbox" id="isFavorite" th:field="*{isFavorite}">
-    </div>
+            <div class="form-group">
+                <label for="personalScore">Personal Score</label>
+                <input type="number" id="personalScore" th:field="*{personalScore}" min="1" max="10">
+                <div th:if="${#fields.hasErrors('personalScore')}" class="error-text">
+                    <p th:errors="*{personalScore}"></p>
+                </div>
+            </div>
 
-    <div>
-        <label for="category">Категорія:</label>
-        <select id="category" name="categoryId">
-            <option value="">-- Без категорії --</option>
-            <option th:each="category : ${categories}"
-                    th:value="${category.id}"
-                    th:text="${category.name}"
-                    th:selected="${titleForm.category != null and titleForm.category.id == category.id}">
-            </option>
-        </select>
-    </div>
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" name="categoryId">
+                    <option value="">None</option>
+                    <option th:each="cat : ${categories}"
+                            th:value="${cat.id}"
+                            th:text="${cat.name}"
+                            th:selected="${titleForm.category != null and titleForm.category.id == cat.id}">
+                    </option>
+                </select>
+            </div>
 
-    <div>
-        <button type="submit">Зберегти</button>
-    </div>
-</form>
+            <div class="form-group full">
+                <label for="synopsis">Synopsis</label>
+                <textarea id="synopsis" th:field="*{synopsis}"></textarea>
+            </div>
+
+            <div class="form-group full">
+                <label for="imageUrl">Image URL</label>
+                <input type="text" id="imageUrl" th:field="*{imageUrl}">
+            </div>
+
+            <div class="form-group full">
+                <label for="imageFile">Upload Image</label>
+                <input type="file" id="imageFile" name="imageFile" accept="image/*">
+            </div>
+
+            <div class="form-group full" th:if="${titleForm.imageUrl != null and !#strings.isEmpty(titleForm.imageUrl)}">
+                <div class="preview">
+                    <p>Current image:</p>
+                    <img th:src="${titleForm.imageUrl}" alt="Current image">
+                </div>
+            </div>
+
+            <div class="form-group full">
+                <label class="form-checkbox">
+                    <input type="checkbox" th:field="*{isFavorite}">
+                    Favorite
+                </label>
+            </div>
+        </div>
+
+        <div class="actions-row" style="margin-top: 20px;">
+            <button class="btn btn-primary" type="submit">Save</button>
+            <a href="/titles" class="btn btn-secondary">Back to Titles</a>
+            <a href="/search" class="btn btn-secondary">Search via API</a>
+        </div>
+    </form>
+</div>
+
 </body>
 </html>

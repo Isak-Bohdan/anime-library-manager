@@ -1,10 +1,23 @@
 <!DOCTYPE html>
 <html lang="uk" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <meta charset="UTF-8">
     <title th:text="${pageTitle}">Форма категорії</title>
 </head>
 <body>
+
+<div class="header">
+    <div><strong>AnimeTracker</strong></div>
+
+    <div class="nav">
+        <a href="/">Home</a>
+        <a href="/titles">Titles</a>
+        <a href="/categories">Categories</a>
+        <a href="/search">Search</a>
+    </div>
+</div>
+
 <h1 th:text="${pageTitle}">Форма категорії</h1>
 
 <a href="/categories">Назад до списку категорій</a>

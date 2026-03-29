@@ -16,9 +16,17 @@ public class SearchController {
     }
 
     @GetMapping("/search")
-    public String searchAnime(@RequestParam(required = false) String query, Model model) {
-        if (query != null && !query.isBlank()) {
-            model.addAttribute("results", jikanService.searchAnime(query));
+    public String search(@RequestParam(required = false) String query,
+                         @RequestParam(defaultValue = "anime") String type,
+                         Model model) {
+
+        if (query != null && !query.isEmpty()) {
+
+            if (type.equals("manga")) {
+                model.addAttribute("results", jikanService.searchManga(query));
+            } else {
+                model.addAttribute("results", jikanService.searchAnime(query));
+            }
         }
 
         return "search";

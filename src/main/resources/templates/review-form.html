@@ -1,10 +1,23 @@
 <!DOCTYPE html>
 <html lang="uk" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <meta charset="UTF-8">
     <title>Додати відгук</title>
 </head>
 <body>
+
+<div class="header">
+    <div><strong>AnimeTracker</strong></div>
+
+    <div class="nav">
+        <a href="/">Home</a>
+        <a href="/titles">Titles</a>
+        <a href="/categories">Categories</a>
+        <a href="/search">Search</a>
+    </div>
+</div>
+
 <h1>Додати відгук для: <span th:text="${title.title}"></span></h1>
 
 <a th:href="@{/titles/{id}/reviews(id=${title.id})}">Назад до відгуків</a>

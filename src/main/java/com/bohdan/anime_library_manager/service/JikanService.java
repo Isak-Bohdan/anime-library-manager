@@ -21,8 +21,27 @@ public class JikanService {
         return response != null ? response.getData() : List.of();
     }
 
+    public List<JikanAnimeDto> searchManga(String query) {
+        String url = "https://api.jikan.moe/v4/manga?q=" + query + "&limit=10";
+
+        JikanSearchResponse response =
+                restTemplate.getForObject(url, JikanSearchResponse.class);
+
+        return response != null ? response.getData() : List.of();
+    }
+
+
     public JikanAnimeDto getAnimeById(Long malId) {
         String url = "https://api.jikan.moe/v4/anime/" + malId;
+
+        JikanAnimeDtoWrapper response =
+                restTemplate.getForObject(url, JikanAnimeDtoWrapper.class);
+
+        return response != null ? response.getData() : null;
+    }
+
+    public JikanAnimeDto getMangaById(Long malId) {
+        String url = "https://api.jikan.moe/v4/manga/" + malId;
 
         JikanAnimeDtoWrapper response =
                 restTemplate.getForObject(url, JikanAnimeDtoWrapper.class);

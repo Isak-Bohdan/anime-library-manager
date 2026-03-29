@@ -4,11 +4,15 @@ import com.bohdan.anime_library_manager.dto.JikanAnimeDto;
 import com.bohdan.anime_library_manager.entity.Category;
 import com.bohdan.anime_library_manager.entity.Title;
 import com.bohdan.anime_library_manager.service.CategoryService;
+import com.bohdan.anime_library_manager.service.FileStorageService;
 import com.bohdan.anime_library_manager.service.JikanService;
 import com.bohdan.anime_library_manager.service.TitleService;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 
@@ -18,13 +22,16 @@ public class TitleController {
     private final TitleService titleService;
     private final CategoryService categoryService;
     private final JikanService jikanService;
+    private final FileStorageService fileStorageService;
 
     public TitleController(TitleService titleService,
                            CategoryService categoryService,
-                           JikanService jikanService) {
+                           JikanService jikanService,
+                           FileStorageService fileStorageService) {
         this.titleService = titleService;
         this.categoryService = categoryService;
         this.jikanService = jikanService;
+        this.fileStorageService = fileStorageService;
     }
 
     @GetMapping("/titles")
@@ -42,10 +49,25 @@ public class TitleController {
     }
 
     @PostMapping("/titles")
-    public String createTitle(@ModelAttribute("titleForm") Title title,
-                              @RequestParam(value = "categoryId", required = false) Long categoryId) {
+    public String createTitle(@Valid @ModelAttribute("titleForm") Title title,
+                              BindingResult bindingResult,
+                              @RequestParam(value = "categoryId", required = false) Long categoryId,
+                              @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                              Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", categoryService.getAllCategories());
+            model.addAttribute("pageTitle", "Додати тайтл");
+            return "title-form";
+        }
 
         applyCategory(title, categoryId);
+
+        String uploadedImagePath = fileStorageService.saveFile(imageFile);
+        if (uploadedImagePath != null) {
+            title.setImageUrl(uploadedImagePath);
+        }
+
         titleService.saveTitle(title);
         return "redirect:/titles";
     }
@@ -60,13 +82,23 @@ public class TitleController {
         model.addAttribute("pageTitle", "Редагувати тайтл");
         return "title-form";
     }
+
     @PostMapping("/titles/{id}")
     public String updateTitle(@PathVariable Long id,
-                              @ModelAttribute("titleForm") Title updatedTitle,
-                              @RequestParam(value = "categoryId", required = false) Long categoryId) {
+                              @Valid @ModelAttribute("titleForm") Title updatedTitle,
+                              BindingResult bindingResult,
+                              @RequestParam(value = "categoryId", required = false) Long categoryId,
+                              @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                              Model model) {
 
         Title existingTitle = titleService.getTitleById(id)
                 .orElseThrow(() -> new RuntimeException("Title not found with id: " + id));
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("categories", categoryService.getAllCategories());
+            model.addAttribute("pageTitle", "Редагувати тайтл");
+            return "title-form";
+        }
 
         existingTitle.setExternalId(updatedTitle.getExternalId());
         existingTitle.setTitle(updatedTitle.getTitle());
@@ -83,6 +115,11 @@ public class TitleController {
 
         applyCategory(existingTitle, categoryId);
 
+        String uploadedImagePath = fileStorageService.saveFile(imageFile);
+        if (uploadedImagePath != null) {
+            existingTitle.setImageUrl(uploadedImagePath);
+        }
+
         titleService.saveTitle(existingTitle);
         return "redirect:/titles";
     }
@@ -93,30 +130,38 @@ public class TitleController {
         return "redirect:/titles";
     }
 
-
     @PostMapping("/titles/import/{malId}")
-    public String importFromJikan(@PathVariable Long malId) {
+    public String importFromJikan(@PathVariable Long malId,
+                                  @RequestParam(defaultValue = "anime") String type) {
+
         if (titleService.getByExternalId(malId).isPresent()) {
             return "redirect:/titles";
         }
 
-        JikanAnimeDto anime = jikanService.getAnimeById(malId);
+        JikanAnimeDto item;
 
-        if (anime == null) {
+        if (type.equals("manga")) {
+            item = jikanService.getMangaById(malId);
+        } else {
+            item = jikanService.getAnimeById(malId);
+        }
+
+        if (item == null) {
             return "redirect:/search";
         }
 
         Title title = new Title();
-        title.setExternalId(anime.getMalId());
-        title.setTitle(anime.getTitle());
-        title.setType("anime");
-        title.setEpisodesOrChapters(anime.getEpisodes());
-        title.setStatus(anime.getStatus());
-        title.setYear(anime.getYear());
-        title.setSynopsis(anime.getSynopsis());
+        title.setExternalId(item.getMalId());
+        title.setTitle(item.getTitle());
+        title.setType(type);
+        title.setEpisodesOrChapters(item.getEpisodes());
+        title.setStatus(item.getStatus());
+        title.setYear(item.getYear());
+        title.setSynopsis(item.getSynopsis());
+        title.setImageUrl(item.getImageUrl());
 
-        if (anime.getScore() != null) {
-            title.setScoreApi(BigDecimal.valueOf(anime.getScore()));
+        if (item.getScore() != null) {
+            title.setScoreApi(BigDecimal.valueOf(item.getScore()));
         }
 
         Category defaultCategory = categoryService.getCategoryByName("Planned").orElse(null);

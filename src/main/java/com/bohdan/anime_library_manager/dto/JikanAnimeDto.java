@@ -14,6 +14,7 @@ public class JikanAnimeDto {
     private Integer year;
     private String synopsis;
     private Double score;
+    private Images images;
 
     public Long getMalId() {
         return malId;
@@ -77,5 +78,45 @@ public class JikanAnimeDto {
 
     public void setScore(Double score) {
         this.score = score;
+    }
+
+    public Images getImages() {
+        return images;
+    }
+
+    public void setImages(Images images) {
+        this.images = images;
+    }
+
+    public String getImageUrl() {
+        if (images != null && images.getJpg() != null) {
+            return images.getJpg().getImageUrl();
+        }
+        return null;
+    }
+
+    public static class Images {
+        private Jpg jpg;
+
+        public Jpg getJpg() {
+            return jpg;
+        }
+
+        public void setJpg(Jpg jpg) {
+            this.jpg = jpg;
+        }
+    }
+
+    public static class Jpg {
+        @JsonProperty("image_url")
+        private String imageUrl;
+
+        public String getImageUrl() {
+            return imageUrl;
+        }
+
+        public void setImageUrl(String imageUrl) {
+            this.imageUrl = imageUrl;
+        }
     }
 }
